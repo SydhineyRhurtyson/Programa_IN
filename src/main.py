@@ -1,0 +1,19 @@
+bibliotecas =["logsfacilitator","qiskit_optimization","qiskit","qiskit_algorithms" ]
+for biblioteca in bibliotecas:
+    Check_library(biblioteca)
+# from variaveis import *
+from funcition import mochileiro , resolver_mochila_quantica_ajustada
+from logsfacilitator import Check_library
+if __name__ == "__main__":
+    valor = [40, 100, 50, 60]
+    peso = [20, 10, 40, 30]
+    capacidade =50
+    capacidade = 50
+    valorfinal , intens_escolhidos, intens_escolhidos_nomes= mochileiro(valor, peso,capacidade)
+    print("=+="*50)
+    print(f"O resultado final:{ valorfinal}")
+    print(intens_escolhidos)
+    print("=+="*50)
+    val_q, itens_q = resolver_mochila_quantica_ajustada(valor, peso, capacidade)
+    print(f"Quântico (QAOA) - Valor máximo corrigido: {val_q}")
+    print(f"Itens escolhidos (Apenas os itens reais): {itens_q}")
