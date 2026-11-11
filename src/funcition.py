@@ -85,7 +85,42 @@ def mochila_quantica(valores, pesos, capacidade_maxima):
     return valor_real_encontrado, itens_reais
 
 # Exemplo de uso com os mesmos dados:
+@measure_time_and_memory("data")
+def resolver_mochila_quantica(valores, pesos, capacidade_maxima):
+    # 1. Configurar o problema de otimização matemática
+    qp = QuadraticProgram()
+    
+    for i in range(len(valores)):
+        qp.binary_var(f'x_{i}')
 
+    qp.maximize(linear={f'x_{i}': valores[i] for i in range(len(valores))})
+
+    qp.linear_constraint(
+        linear={f'x_{i}': pesos[i] for i in range(len(pesos))},
+        sense='<=',
+        rhs=capacidade_maxima,
+        name='restricao_peso'
+    )
+
+    # 2. Conversão para QUBO e operador de Ising
+    conversor = QuadraticProgramToQubo()
+    qubo = conversor.convert(qp)
+    
+    operador_ising, offset = qubo.to_ising()
+    num_qubits = operador_ising.num_qubits
+    print(f"-> Mapeamento Quântico: O problema utilizou exatamente {num_qubits} qubits.")
+
+    # 3. Execução usando o QAOA com o Sampler atualizado
+    sampler = Sampler()
+    otimizador_classico = COBYLA(maxiter=100)
+    
+    qaoa = QAOA(sampler=sampler, optimizer=otimizador_classico, reps=1)
+    otimizador_quantico = MinimumEigenOptimizer(qaoa)
+    resultado = otimizador_quantico.solve(qubo)
+
+    solucao_binaria = [int(x) for x in resultado.x]
+    
+    return resultado.fval, solucao_binaria, num_qubits
 
 if __name__ == "__main__":
     # Example Usage
@@ -138,7 +173,10 @@ if __name__ == "__main__":
     valor = [40, 100, 50, 60]
     peso = [20, 10, 40, 30]
     capacidade =50
-    val_q, itens_q = mochila_quantica(valor, peso, capacidade)
-    print(f"Quântico (QAOA) - Valor máximo corrigido: {val_q}")
-    print(f"Itens escolhidos (Apenas os itens reais): {itens_q}")
+    val_q, itens_q, qubits_usados = resolver_mochila_quantica(valor, peso, capacidade)
+    print(f"Quântico (QAOA) - Valor máximo encontrado: {val_q}")
+    print(f"Itens escolhidos (Qubits ativados): {itens_q}")
+    # val_q, itens_q = resolver_mochila_quantica(valor, peso, capacidade)
+    # print(f"Quântico (QAOA) - Valor máximo corrigido: {val_q}")
+    # print(f"Itens escolhidos (Apenas os itens reais): {itens_q}")
     # print("Maximum value in knapsack =", fractional_knapsack(values2, weights2, W2))  # Output: 210

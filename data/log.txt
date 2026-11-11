@@ -108,3 +108,8 @@ Function: mochileiro, Args: {'valores': [40, 100, 50, 60], 'peso': [20, 10, 40, 
 Time: 0.0:0.0001 seconds
 Memory current: 0.00 MB, Memory maximum: 0.00 MB
 =+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+=
+Logs:2026-11-10 22:36:23.611122
+Function: resolver_mochila_quantica, Args: {'valores': [40, 100, 50, 60], 'pesos': [20, 10, 40, 30], 'capacidade_maxima': 50}
+Time: 12.0:42.7222 seconds
+Memory current: 1.20 MB, Memory maximum: 173.43 MB
+=+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+==+=
