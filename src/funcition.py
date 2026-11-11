@@ -49,13 +49,8 @@ def mochileiro(valores:list[float],peso:list[float],c:float,nomes:list[str]=None
             return vm,ie,None
 
 
-# Exemplo de uso:py -Sua_versão -m pip install --upgrade  logsfacilitator
 @measure_time_and_memory("data")
-def mochileiro_quantico(valores:list[float],peso:list[float],c:float,nomes:list[str]=None):
-    pass
-
-@measure_time_and_memory("data")
-def resolver_mochila_quantica_ajustada(valores, pesos, capacidade_maxima):
+def mochila_quantica(valores, pesos, capacidade_maxima):
     qp = QuadraticProgram()
     
     for i in range(len(valores)):
@@ -73,8 +68,6 @@ def resolver_mochila_quantica_ajustada(valores, pesos, capacidade_maxima):
     conversor = QuadraticProgramToQubo()
     qubo = conversor.convert(qp)
     
-    # AJUSTE 1: Aumentamos 'reps' de 1 para 3 (circuito mais profundo) 
-    # e 'maxiter' para 500 (mais tentativas clássicas)
     sampler = Sampler()
     otimizador_classico = COBYLA(maxiter=500)
     qaoa = QAOA(sampler=sampler, optimizer=otimizador_classico, reps=3)
@@ -84,11 +77,9 @@ def resolver_mochila_quantica_ajustada(valores, pesos, capacidade_maxima):
 
     solucao_binaria = [int(x) for x in resultado.x]
     
-    # AJUSTE 2: Filtrar apenas os qubits que representam os itens (ignorando as folgas)
     num_itens = len(valores)
     itens_reais = solucao_binaria[:num_itens]
     
-    # AJUSTE 3: Recalcular o valor manualmente para evitar o erro do sinal negativo do QUBO
     valor_real_encontrado = sum(valores[i] * itens_reais[i] for i in range(num_itens))
     
     return valor_real_encontrado, itens_reais
@@ -147,7 +138,7 @@ if __name__ == "__main__":
     valor = [40, 100, 50, 60]
     peso = [20, 10, 40, 30]
     capacidade =50
-    val_q, itens_q = resolver_mochila_quantica_ajustada(valor, peso, capacidade)
+    val_q, itens_q = mochila_quantica(valor, peso, capacidade)
     print(f"Quântico (QAOA) - Valor máximo corrigido: {val_q}")
     print(f"Itens escolhidos (Apenas os itens reais): {itens_q}")
     # print("Maximum value in knapsack =", fractional_knapsack(values2, weights2, W2))  # Output: 210

@@ -1,0 +1,4 @@
+logsfacilitator >= 0.2.8
+qiskit_optimization >=0.7.0
+qiskit >=2.6.1
+qiskit_algorithms >= 0.4.0
