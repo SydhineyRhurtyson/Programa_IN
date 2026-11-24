@@ -5,7 +5,8 @@ from qiskit_optimization.algorithms import MinimumEigenOptimizer
 from qiskit_algorithms import QAOA
 from qiskit.primitives import StatevectorSampler as Sampler
 from qiskit_algorithms.optimizers import COBYLA
-
+import dimod
+from dwave.samplers import SimulatedAnnealingSampler
 
 @measure_time_and_memory("data")
 def mochileiro(valores:list[float],peso:list[float],c:float,nomes:list[str]=None):
@@ -122,6 +123,47 @@ def resolver_mochila_quantica(valores, pesos, capacidade_maxima):
     
     return resultado.fval, solucao_binaria, num_qubits
 
+@measure_time_and_memory("data")
+def resolver_mochila_dwave(valores, pesos, capacidade_maxima, num_reads=1000):
+    # 1. Criar o Modelo Quadrático com Restrições (CQM)
+    cqm = dimod.ConstrainedQuadraticModel()
+    
+    # Criar uma variável binária (0 ou 1) para cada item
+    itens = [dimod.Binary(f'x_{i}') for i in range(len(valores))]
+    
+    # Função Objetivo: Maximizar o valor total
+    # Como o D-Wave sempre minimiza energia, multiplicamos os valores por -1
+    cqm.set_objective(-sum(valores[i] * itens[i] for i in range(len(valores))))
+    
+    # Restrição de Peso: soma(pesos * x_i) <= capacidade_maxima
+    cqm.add_constraint(
+        sum(pesos[i] * itens[i] for i in range(len(pesos))) <= capacidade_maxima,
+        label='capacidade_mochila'
+    )
+    
+    # 2. Converter CQM para BQM (QUBO)
+    # O multiplicador de Lagrange define a penalidade caso o peso ultrapasse o limite
+    penalidade = max(valores) * 2
+    bqm, inverter = dimod.cqm_to_bqm(cqm, lagrange_multiplier=penalidade)
+    
+    # Contabiliza o total de variáveis (itens reais + variáveis de folga criadas)
+    total_variaveis_qubo = len(bqm.variables)
+    
+    # 3. Executar o amostrador local (simula o comportamento do hardware D-Wave)
+    sampler = SimulatedAnnealingSampler()
+    sampleset = sampler.sample(bqm, num_reads=num_reads)
+    
+    # 4. Extrair a solução de menor energia e remover as variáveis de folga
+    melhor_amostra_bqm = sampleset.first.sample
+    solucao_original = inverter(melhor_amostra_bqm)
+    
+    itens_escolhidos = [int(solucao_original[f'x_{i}']) for i in range(len(valores))]
+    valor_total = sum(valores[i] * itens_escolhidos[i] for i in range(len(valores)))
+    peso_total = sum(pesos[i] * itens_escolhidos[i] for i in range(len(valores)))
+    
+    return valor_total, peso_total, itens_escolhidos, total_variaveis_qubo
+
+
 if __name__ == "__main__":
     # Example Usage
     # values1 = [60, 100, 120]
@@ -176,7 +218,3 @@ if __name__ == "__main__":
     val_q, itens_q, qubits_usados = resolver_mochila_quantica(valor, peso, capacidade)
     print(f"Quântico (QAOA) - Valor máximo encontrado: {val_q}")
     print(f"Itens escolhidos (Qubits ativados): {itens_q}")
-    # val_q, itens_q = resolver_mochila_quantica(valor, peso, capacidade)
-    # print(f"Quântico (QAOA) - Valor máximo corrigido: {val_q}")
-    # print(f"Itens escolhidos (Apenas os itens reais): {itens_q}")
-    # print("Maximum value in knapsack =", fractional_knapsack(values2, weights2, W2))  # Output: 210

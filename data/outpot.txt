@@ -1,0 +1,15 @@
+[classico    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+[qiskit_qaoa ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+[dwave_sa    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+====================================================================================================================
+[classico    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+[qiskit_qaoa ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=8 razao_aprox=100.00%
+[dwave_sa    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=8 razao_aprox=100.00%
+====================================================================================================================
+[classico    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+[qiskit_qaoa ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=9 razao_aprox=100.00%
+[dwave_sa    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=9 razao_aprox=100.00%
+====================================================================================================================
+[classico    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=None razao_aprox=100.00%
+[qiskit_qaoa ] valor=5530 peso=13 itens=[0, 2, 4, 5] viavel=True variaveis=10 razao_aprox=85.08%
+[dwave_sa    ] valor=6500 peso=13 itens=[0, 1, 2] viavel=True variaveis=10 razao_aprox=100.00%
